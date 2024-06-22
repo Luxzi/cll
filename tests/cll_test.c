@@ -1,8 +1,29 @@
-#include <cll.h>
+#include <bits/time.h>
+#include <cll.h>	
 #include <unity.h>
 #include <time.h>
-#include <Windows.h>
 #include "log.h"
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
+#ifdef _WIN32
+double get_time() {
+    LARGE_INTEGER t, f;
+    QueryPerformanceCounter(&t);
+    QueryPerformanceFrequency(&f);
+    return (double)t.QuadPart/(double)f.QuadPart;
+}
+#endif
+
+#ifdef __unix__
+double get_time() {
+	struct timespec benchtime;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &benchtime);
+	return benchtime.tv_sec + (benchtime.tv_nsec * 1e-9);
+}
+#endif
 
 void setUp(void) {};
 void tearDown(void) {};
@@ -106,12 +127,6 @@ void findNodeAt(void) {
     linkedlist_free(&testlist);
 }
 
-double get_time() {
-    LARGE_INTEGER t, f;
-    QueryPerformanceCounter(&t);
-    QueryPerformanceFrequency(&f);
-    return (double)t.QuadPart/(double)f.QuadPart;
-}
 
 void benchmarkList(void) {
     int nodes = 1 << 10;
